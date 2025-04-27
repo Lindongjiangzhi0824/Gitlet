@@ -24,7 +24,7 @@ public class Main {
             case "add":
                 // TODO: handle the `add [filename]` command
                 String addFileName = args[1];
-                addStage
+                addStage(addFileName);
                 break;
             // TODO: FILL THE REST IN
         }

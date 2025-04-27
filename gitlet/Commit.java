@@ -4,12 +4,11 @@ package gitlet;
 
 import java.io.File;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Date; // TODO: You'll likely use this in this class
-import java.util.HashMap;
+import java.util.*;
 
 import static gitlet.Refs.*;
 import static gitlet.Utils.*;
+import static java.lang.System.exit;
 
 /** Represents a gitlet commit object.
  *  TODO: It's a good idea to give a description here of what else this Class
@@ -56,6 +55,12 @@ public class Commit implements Serializable {
     }
     /* To save commit into files in COMMIT_FOLDER, persists the status of object. */
     public void saveCommit(){
+        // 1.得到文件名
+        String name = this.getHashName();
+        // 2.创建文件存放路径
+        File commitFile = new File(COMMIT_OBJ_DIR, name);
+        // 3.将对象序列化写入
+        writeObject(commitFile, this);
 
     }
     public void addBlob(String fileName, String blobName){
@@ -76,7 +81,7 @@ public class Commit implements Serializable {
         return this;
     }
 
-    public String directParent() {
+    public String getDirectParent() {
         return directParent;
     }
 
@@ -85,7 +90,7 @@ public class Commit implements Serializable {
         return this;
     }
 
-    public String otherParent() {
+    public String getOtherParent() {
         return otherParent;
     }
 
@@ -103,7 +108,7 @@ public class Commit implements Serializable {
         return this;
     }
 
-    public HashMap<String, String> blobMap() {
+    public HashMap<String, String> getBlobMap() {
         return blobMap;
     }
 
@@ -114,6 +119,10 @@ public class Commit implements Serializable {
     /* ======================== 以上为getter和setter ======================*/
     /* TODO: fill in the rest of this class. */
 
+    /**
+     * 获取 HEAD 指针指向的Commit对象
+     * @return
+     */
     public static Commit getHeadCommit(){
         /* To obtain HEAD pointer, this pointer point to newest commit. */
         String headContent = readContentsAsString(HEAD_POINT);
@@ -124,4 +133,129 @@ public class Commit implements Serializable {
 
         return commit;
     }
+
+    /**
+     * 用于获取branches文件夹中分类文件指向Commit对象
+     * @param branchName
+     * @param errorMsg
+     * @return 反序列化后的对象（还原）
+     */
+    public static Commit getBranchHeadCommit(String branchName, String errorMsg){
+        File branchFile = join(HEADS_DIR, branchName);
+        if(!branchFile.exists()){
+            System.out.println(errorMsg);
+            exit(0);
+        }
+        /* 获取头指针，这个指针指向最新的 commit */
+        String headHashName = readContentsAsString(branchFile);
+        File commitFile = join(COMMIT_OBJ_DIR, headHashName);
+        /*获取commit文件*/
+        Commit commit = readObject(commitFile, Commit.class);
+
+        return commit;
+    }
+
+    /**
+     * 通过 hash 值来返回 Commit 对象
+     * @param hashName
+     * @return 对应的 Commit 对象
+     */
+    public static Commit getCommit(String hashName){
+        List<String> commitFiles = plainFilenamesIn(COMMIT_OBJ_DIR);
+        /* 如果在 commit 文件夹中不存在次文件 */
+        if(!commitFiles.contains(hashName)){
+            return null;
+        }
+
+        File commitFile = join(COMMIT_OBJ_DIR, hashName);
+        Commit commit = readObject(commitFile, Commit.class);
+        return commit;
+    }
+
+    /**
+     * 给定一个 commitId, 返回一个相对应的 commit 对象， 若没有这个 commit 对象，则返回 null
+     * @param commitId
+     * @return commit or null
+     */
+    public static Commit getCommitFromId(String commitId){
+        Commit commit = null;
+
+        /* 从commit文件夹中寻找*/
+        String resCommitId = null;
+        List<String> commitFileNames = plainFilenamesIn(COMMIT_OBJ_DIR);
+        /* 匹配前缀 */
+        for(String commitFileName : commitFileNames){
+            if(commitFileName.startsWith(commitId)){
+                resCommitId = commitFileName;
+                break;
+            }
+        }
+
+        if(resCommitId == null){
+            return null;
+        }else{
+            File commitFile = join(COMMIT_OBJ_DIR, commitId);
+            commit = readObject(commitFile, Commit.class);
+        }
+
+        return commit;
+    }
+
+    /**
+     * 获取两个分支的共同节点， 从 directParent 搜索
+     * @param commitA
+     * @param commitB
+     * @return
+     */
+    public static Commit getSplitCommit(Commit commitA, Commit commitB){
+        Commit p1 = commitA, p2 = commitB;
+        /* 遍历提交链 */
+        Deque<Commit> dequecommitA = new ArrayDeque<>();
+        Deque<Commit> dequecommitB = new ArrayDeque<>();
+
+        /* 保存访问过的节点 */
+        HashSet<String> visitedInCommitA = new HashSet<>();
+        HashSet<String> visitedInCommitB = new HashSet<>();
+
+        dequecommitA.add(p1);
+        dequecommitB.add(p2);
+
+        while(!dequecommitA.isEmpty() && !dequecommitB.isEmpty()){
+            if(!dequecommitA.isEmpty()){
+                /* commitA 的队列中存在可遍历对象 */
+                Commit currA =  dequecommitA.poll();
+                if(visitedInCommitB.contains(currA.getHashName())){
+                    return currA;
+                }
+                visitedInCommitA.add(currA.getHashName());
+                addParentsToDeque(currA, dequecommitA);
+            }
+
+            if(!dequecommitB.isEmpty()){
+                Commit currB =  dequecommitB.poll();
+                if(visitedInCommitA.contains(currB.getHashName())){
+                    return currB;
+                }
+                visitedInCommitB.add(currB.getHashName());
+                addParentsToDeque(currB, dequecommitB);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 将此节点的父节点 （或两个父节点） 放入队列中
+     * @param commit
+     * @param dequeCommit
+     */
+    private static void addParentsToDeque(Commit commit, Queue<Commit> dequeCommit){
+        if(!commit.getDirectParent().isEmpty()){
+            dequeCommit.add(getCommitFromId(commit.getDirectParent()));
+        }
+
+        if(commit.getOtherParent() != null){
+            dequeCommit.add(getCommitFromId(commit.getOtherParent()));
+        }
+    }
+
 }

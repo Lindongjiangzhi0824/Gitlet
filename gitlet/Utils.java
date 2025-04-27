@@ -137,7 +137,9 @@ class Utils {
     }
 
     /** Return an object of type T read from FILE, casting it to EXPECTEDCLASS.
-     *  Throws IllegalArgumentException in case of problems. */
+     *  Throws IllegalArgumentException in case of problems.
+     *  将File对象的地址转化成原本的对象后返回 （反序列化）
+     *  */
     static <T extends Serializable> T readObject(File file,
                                                  Class<T> expectedClass) {
         try {
@@ -170,7 +172,9 @@ class Utils {
 
     /** Returns a list of the names of all plain files in the directory DIR, in
      *  lexicographic order as Java Strings.  Returns null if DIR does
-     *  not denote a directory. */
+     *  not denote a directory.
+     *  返回目录 DIR 中所有纯文本文件名的列表，以 Java 字符串形式按字典顺序排列。如果 DIR 不表示目录，则返回 null
+     *  */
     static List<String> plainFilenamesIn(File dir) {
         String[] files = dir.list(PLAIN_FILES);
         if (files == null) {
