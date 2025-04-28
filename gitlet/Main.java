@@ -11,30 +11,27 @@ public class Main {
      */
     public static void main(String[] args) {
         // TODO: what if args is empty?
+        checkArgsEmpty(args);
         String firstArg = args[0];
-        if (args.length == 0){
-            Utils.exitWithError("Must have at least one argument");
-        }
-        String text;
-        switch(firstArg) {
-            case "init":
-                // TODO: handle the `init` command
-                Repository.setupPersistence();
-                break;
-            case "add":
-                // TODO: handle the `add [filename]` command
-                String addFileName = args[1];
-                addStage(addFileName);
-                break;
-            // TODO: FILL THE REST IN
-        }
-    }
 
-    public static void validateNumArgs(String cmd,String[] args, int n) {
-        if(args.length != n){
-            throw new RuntimeException{
-                String.format("Invalid number of arguments for: %s.", cmd));
+        try {
+            switch(firstArg) {
+                case "init":
+                    // TODO: handle the `init` command
+                    if(args.length != 1){
+                        throw new GitletException("Incorrect number of operands");
+                    }
+                    Repository.setupPersistence();
+                    break;
+                case "add":
+                    // TODO: handle the `add [filename]` command
+                    String addFileName = args[1];
+                    addStage(addFileName);
+                    break;
+                // TODO: FILL THE REST IN
             }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }

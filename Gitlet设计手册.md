@@ -95,3 +95,30 @@ java gitlet.Main init
 ## add
 
 java gitlet.Main add [file name]
+
+将指定的文件放入 addstage 文件夹中，将文件内容创建为 blob 文件， 以内容的 hash 值作为文件名来保存刀 objects/blobs文件夹中
+
+将当前存在的文件副本添加到暂存stage区域
+
+暂存已暂存的文件会用新内容覆盖暂存区域中的上一个条目。暂存区域应该位于 .gitlet 中
+
+**如果文件的当前工作版本与当前commit中的版本相同，请不要暂存要添加的文件， 如果它已经存在，将其从暂存区域中删除（当文件被更改、添加，然后更改回其原始版本时，可能会发生这种情况）。**
+
+```txt
+.gitlet (folder)
+    |── objects (folder) 
+        |-- commits
+        |-- blobs
+            |-- <hash>  <----- 加入的file.txt文件内容
+    |── refs (folder)
+        |── heads (folder) 
+            |-- master (file)
+            |-- other file     
+        |-- HEAD (file)     
+    |-- addstage (folder)       
+        |-- file.txt  <----- 保存blob文件的路径
+    |-- removestage (folder)
+
+file.txt  <----- 加入的文件
+```
+

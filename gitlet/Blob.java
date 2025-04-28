@@ -3,7 +3,7 @@ package gitlet;
 import java.io.File;
 import java.io.Serializable;
 
-import static gitlet.Repository.*;
+import static gitlet.Refs.*;
 import static gitlet.Utils.*;
 
 public class Blob implements Serializable {
@@ -11,10 +11,10 @@ public class Blob implements Serializable {
     private File filePath;
     private String hashName;
 
-    public Blob(String content, File filePath, String hashName) {
+    public Blob(String content, String hashName) {
         this.content = content;
-        this.filePath = filePath;
-        this.hashName = join(BLOBS_FOLDER, hashName);
+        this.hashName = hashName;
+        this.filePath = join(BLOBS_FOLDER, hashName);
     }
 
     public File getFilePath() {
