@@ -2,8 +2,7 @@ package gitlet;
 
 import java.io.File;
 
-import static gitlet.Utils.join;
-import static gitlet.Utils.writeContents;
+import static gitlet.Utils.*;
 
 public class Refs {
     /** The current working directory. */
@@ -22,8 +21,8 @@ public class Refs {
     public static final File REMOVE_STAGE = join(GITLET_DIR, "removestage");
 
     /**
-     * Create a file , the path is join(HEAD_DIR, branchName)
-     * then write to hashName for its contents
+     * 创建一个文件，路径为 join(HEADS_DIR, branchName)
+     * 向其中写入 hashName
      * @param branchName
      * @param hashName
      */
@@ -33,12 +32,22 @@ public class Refs {
     }
 
     /**
-     * In HEAD file write current branch and hash value.
-     * Save the point to HEAD into .gitlet/refs/HEAD folder
+     * 在 HEAD 文件中写入当前branch的hash值
+     *
      * @param branchName
      * @param branchHeadCommitHash
      */
     public static void saveHEAD(String branchName, String branchHeadCommitHash) {
         writeContents(HEAD_POINT, branchName + ":" + branchHeadCommitHash);
+    }
+
+    /**
+     * 从 HEAD 文件中直接获取当前 branch 的名字
+     */
+    public static String getHeadBranchName(){
+        String headContent = readContentsAsString(HEAD_POINT);
+        String[] splitContent = headContent.split(":");
+        String branchName = splitContent[0];
+        return branchName;
     }
 }
