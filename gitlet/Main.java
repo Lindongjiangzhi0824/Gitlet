@@ -1,5 +1,7 @@
 package gitlet;
 
+import java.util.Scanner;
+
 import static gitlet.Repository.*;
 /** Driver class for Gitlet, a subset of the Git version-control system.
  *  @author TODO
@@ -21,7 +23,7 @@ public class Main {
                     if(args.length != 1){
                         throw new GitletException("Incorrect number of operands");
                     }
-                    Repository.setupPersistence();
+                    Repository.initPersistence();
                     break;
                 case "add":
                     // TODO: handle the `add [filename]` command

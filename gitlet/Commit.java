@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.*;
 
 import static gitlet.Refs.*;
+import static gitlet.Repository.dateToTimeStamp;
 import static gitlet.Utils.*;
 import static java.lang.System.exit;
 
@@ -56,9 +57,9 @@ public class Commit implements Serializable {
     /* To save commit into files in COMMIT_FOLDER, persists the status of object. */
     public void saveCommit(){
         // 1.得到文件名
-        String name = this.getHashName();
+        String hashname = this.getHashName();
         // 2.创建文件存放路径
-        File commitFile = new File(COMMIT_OBJ_DIR, name);
+        File commitFile = new File(COMMITS_DIR, hashname);
         // 3.将对象序列化写入
         writeObject(commitFile, this);
 
@@ -70,7 +71,7 @@ public class Commit implements Serializable {
         this.blobMap.remove(fileName);
     }
     public String getHashName(){
-        return sha1(this);
+        return sha1(this.message, dateToTimeStamp(this.timestamp), this.directParent);
     }
     public String message() {
         return message;
@@ -127,7 +128,7 @@ public class Commit implements Serializable {
         /* To obtain HEAD pointer, this pointer point to newest commit. */
         String headContent = readContentsAsString(HEAD_POINT);
         String headHashName = headContent.split(":")[1];
-        File commitFile = join(COMMIT_OBJ_DIR, headHashName);
+        File commitFile = join(COMMITS_DIR, headHashName);
         /* Obtain commit file. */
         Commit commit = readObject(commitFile, Commit.class);
 
@@ -148,7 +149,7 @@ public class Commit implements Serializable {
         }
         /* 获取头指针，这个指针指向最新的 commit */
         String headHashName = readContentsAsString(branchFile);
-        File commitFile = join(COMMIT_OBJ_DIR, headHashName);
+        File commitFile = join(COMMITS_DIR, headHashName);
         /*获取commit文件*/
         Commit commit = readObject(commitFile, Commit.class);
 
@@ -161,13 +162,13 @@ public class Commit implements Serializable {
      * @return 对应的 Commit 对象
      */
     public static Commit getCommit(String hashName){
-        List<String> commitFiles = plainFilenamesIn(COMMIT_OBJ_DIR);
+        List<String> commitFiles = plainFilenamesIn(COMMITS_DIR);
         /* 如果在 commit 文件夹中不存在次文件 */
         if(!commitFiles.contains(hashName)){
             return null;
         }
 
-        File commitFile = join(COMMIT_OBJ_DIR, hashName);
+        File commitFile = join(COMMITS_DIR, hashName);
         Commit commit = readObject(commitFile, Commit.class);
         return commit;
     }
@@ -182,7 +183,7 @@ public class Commit implements Serializable {
 
         /* 从commit文件夹中寻找*/
         String resCommitId = null;
-        List<String> commitFileNames = plainFilenamesIn(COMMIT_OBJ_DIR);
+        List<String> commitFileNames = plainFilenamesIn(COMMITS_DIR);
         /* 匹配前缀 */
         for(String commitFileName : commitFileNames){
             if(commitFileName.startsWith(commitId)){
@@ -194,7 +195,7 @@ public class Commit implements Serializable {
         if(resCommitId == null){
             return null;
         }else{
-            File commitFile = join(COMMIT_OBJ_DIR, commitId);
+            File commitFile = join(COMMITS_DIR, commitId);
             commit = readObject(commitFile, Commit.class);
         }
 

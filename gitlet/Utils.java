@@ -118,8 +118,7 @@ class Utils {
     static void writeContents(File file, Object... contents) {
         try {
             if (file.isDirectory()) {
-                throw
-                    new IllegalArgumentException("cannot overwrite directory");
+                throw new IllegalArgumentException("cannot overwrite directory");
             }
             BufferedOutputStream str =
                 new BufferedOutputStream(Files.newOutputStream(file.toPath()));

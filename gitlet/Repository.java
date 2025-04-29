@@ -1,12 +1,9 @@
 package gitlet;
 
 import java.io.File;
-import java.sql.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import static gitlet.Commit.*;
 import static gitlet.Refs.*;
@@ -35,11 +32,10 @@ public class Repository {
     public static void setupPersistence() {
         GITLET_DIR.mkdir();
         COMMIT_OBJ_DIR.mkdir();
+        COMMITS_DIR.mkdir();
         BLOBS_FOLDER.mkdir();
         REFS_DIR.mkdir();
         HEADS_DIR.mkdir();
-        MASTER_DIR.mkdir();
-        HEAD.mkdir();
         ADD_STAGE.mkdir();
         REMOVE_STAGE.mkdir();
     }
@@ -57,7 +53,7 @@ public class Repository {
      * @param date : Date obj
      * @return : timestamp in standard format
      */
-    public static String dateToTimestamp(Date date) {
+    public static String dateToTimeStamp(Date date) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
         return dateFormat.format(date);
     }

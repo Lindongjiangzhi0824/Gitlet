@@ -10,14 +10,14 @@ public class Refs {
     /** The .gitlet directory. */
     static final File GITLET_DIR = join(CWD, ".gitlet");
     public static final File COMMIT_OBJ_DIR = join(GITLET_DIR, "objects");
+    public static final File COMMITS_DIR = join(COMMIT_OBJ_DIR, "commits");
+    public static final File BLOBS_FOLDER = join(COMMIT_OBJ_DIR, "blobs");
+
     public static final File REFS_DIR = join(GITLET_DIR, "refs");
     public static final File HEADS_DIR = join(REFS_DIR, "heads");
     public static final File HEAD_POINT = join(REFS_DIR, "HEAD");
 
-    public static final File MASTER_DIR = join(HEADS_DIR, "master");
-    public static final File HEAD = join(GITLET_DIR, "HEAD");
     public static final File ADD_STAGE = join(GITLET_DIR, "addstage");
-    public static final File BLOBS_FOLDER = join(COMMIT_OBJ_DIR, "blobs");
     public static final File REMOVE_STAGE = join(GITLET_DIR, "removestage");
 
     /**
