@@ -136,4 +136,104 @@ public class Repository {
         File blobPoint = join(ADD_STAGE, addFileName);
         writeContents(blobPoint, blobAdd.getFilePath().getName());
     }
+
+    /**
+     * java gitlet/Main.java commit [message]
+     * @param commitMsg
+     */
+    public static void commitFile(String commitMsg) {
+        /* 获取 addstage 中的 filename 和 hashname */
+        List<String> addStageFiles = plainFilenamesIn(ADD_STAGE);
+        List<String> removeStageFiles = plainFilenamesIn(REMOVE_STAGE);
+        /* 文件夹里没有任何记录 或 commitMsg 为空*/
+        if(addStageFiles.isEmpty() &&  removeStageFiles.isEmpty()){
+            throw new GitletException("ERROR:既没添加也没删除任何东西");
+        }
+        if(commitMsg == null || commitMsg.isEmpty()){
+            throw new GitletException("commitMsg为空，你应该输入提交信息！");
+        }
+        /*获取最新的 commit */
+        Commit oldCommit = getHeadCommit();
+        /* 创建新的 commit, newCommit 根据 oldCommit 进行调整*/
+        Commit newCommit =new Commit(oldCommit);
+        newCommit.setDirectParent(oldCommit.getHashName()); //指定父节点
+        newCommit.setTimestamp(new Date(System.currentTimeMillis()));
+        newCommit.setMessage(commitMsg);
+
+        /* 对每一个 addStage 中的 fileName 进行路径读取， 保存进 commit 的 blobMap*/
+        for(String stageFileName : addStageFiles){
+            String hashName = readContentsAsString(join(ADD_STAGE, stageFileName));
+            newCommit.addBlob(stageFileName, hashName);  // newCommit 中更新 blob
+            join(ADD_STAGE, stageFileName).delete();
+        }
+
+        HashMap<String, String> blobMap = newCommit.getBlobMap();
+
+        /* 对每一个 rmstage 中的 fileName 进行路径读取， 删除commit的 blobMap 中对应的值*/
+        for(String stageFileName : removeStageFiles){
+            if(blobMap.containsKey(stageFileName)){
+                newCommit.removeBlob(stageFileName);
+            }
+            join(REMOVE_STAGE, stageFileName).delete();
+        }
+
+        newCommit.saveCommit();
+
+        /* 更新HEAD指针和当前 branch 的 head 指针*/
+        saveHEAD(getHeadBranchName(),newCommit.getHashName());
+        saveBranch(getHeadBranchName(), newCommit.getHashName());
+    }
+
+    /**
+     * java gitlet/Main rm [fileName]
+     * @param removeFileName
+     */
+    public static void removeStage(String removeFileName) {
+        if(removeFileName == null || removeFileName.isEmpty()){
+            System.out.println("please enter a file name.");
+            exit(0);
+        }
+
+        /* 如果 暂存目录中不存在此文件，同时在 commit 中不存在此文件*/
+        Commit headCommit = getHeadCommit();
+        HashMap<String, String> blobMap = headCommit.getBlobMap();
+        List<String> addStageFiles = plainFilenamesIn(ADD_STAGE);
+
+        if(!blobMap.containsKey(removeFileName)){
+            if(!addStageFiles.isEmpty()){
+                System.out.println("No such file, rm failure.");
+                exit(0);
+            }
+        }
+
+        /* 如果 addstage 中存在， 删除*/
+        File addStageFile = join(ADD_STAGE, removeFileName);
+        if(addStageFile.exists()){
+            addStageFile.delete();
+        }
+        /* 此文件正在被 track 中*/
+        if(blobMap.containsKey(removeFileName)){
+            /* 添加进 removeStage */
+            File remoteFilePoint = new File(REMOVE_STAGE, removeFileName);
+            writeContents(remoteFilePoint,"");
+
+            /* 删除工作目录下的文件，仅在这个文件被track的时候进行删除*/
+            File fileDeleted = new File(CWD, removeFileName);
+            restrictedDelete(fileDeleted);
+        }
+    }
+    /**
+     * java gitlet/Main log
+     */
+    public static void printLog(){
+        Commit headCommit = getHeadCommit();
+        Commit commit = headCommit;
+
+        while(!commit.getDirectParent().equals("")){
+            printCommitLog(commit);
+            commit = getCommit(commit.getDirectParent());
+        }
+        /* 打印第一个提交的日志 */
+        printCommitLog(commit);
+    }
 }

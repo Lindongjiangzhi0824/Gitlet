@@ -31,6 +31,20 @@ public class Main {
                     addStage(addFileName);
                     break;
                 // TODO: FILL THE REST IN
+                case "commit":
+                    String commitMsg =  args[1];
+                    commitFile(commitMsg);
+                    break;
+                case "rm":
+                    String removeFile = args[1];
+                    removeStage(removeFile);
+                    break;
+                case "log":
+                    if(args.length != 1){
+                        throw new GitletException("Incorrect number of operands");
+                    }
+                    printLog();
+                    break;
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

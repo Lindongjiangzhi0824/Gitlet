@@ -122,3 +122,29 @@ java gitlet.Main add [file name]
 file.txt  <----- 加入的文件
 ```
 
+## commit
+
+java gitlet/Main.java commit [message]
+
+将 addstage 和 removestage 中的文件一个个进行响应操作， addStage中添加， removeStage中的进行删除，将跟踪文件的快照，并保存到当前提交和暂存的区域中，方便以后可以恢复，以及创建新的提交
+
+提交将只是更新它正在跟踪的文件的内容，这些文件在提交时已暂存以进行添加，
+
+```txt
+.gitlet (folder)
+    |── objects (folder) 
+        |-- commits
+            | -- <hash> <----- 添加进的commit文件，内容是对应的blob文件名
+        |-- blobs
+            |-- <hash>  
+    |── refs (folder)
+        |── heads (folder) 
+            |-- master (file)
+            |-- other file     
+        |-- HEAD (file)     
+    |-- addstage (folder)       
+        |-- file.txt  
+    |-- removestage (folder)
+file.txt  <----- commit的文件
+```
+
