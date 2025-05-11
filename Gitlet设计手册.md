@@ -148,3 +148,119 @@ java gitlet/Main.java commit [message]
 file.txt  <----- commit的文件
 ```
 
+## rm
+
+`java gitlet.Main rm [file name]`
+
+如果文件当前已经暂存进行添加，先取消暂存文件
+
+如果在当前提交中跟踪了该文件，请暂存该文件以供删除，如果用户尚未从工作目录中删除该文件，则从工作目录删除此文件（如果在commit中跟踪此文件，则可以对它remove, 如果没有跟踪就不能删除）
+
+```
+.gitlet (folder)
+    |── objects (folder) 
+        |-- commits
+            | -- <hash> 
+        |-- blobs
+            |-- <hash>  
+    |── refs (folder)
+        |── heads (folder) 
+            |-- master (file)
+            |-- other file     
+        |-- HEAD (file)     
+    |-- addstage (folder)       <----- 若是在addstage中有则删除
+    |-- removestage (folder)
+        |-- file.txt  <----- 添加
+file.txt  <----- 若是在被track状态，则进行删除；若不是在track，就不能删除
+```
+
+
+
+## log
+
+`java gitlet.Main log`
+
+输出 log , 内容是从当前 HEAD 指向的 commit以及所有的 parents 格式如下：
+
+```
+===
+commit a0da1ea5a15ab613bf9961fd86f010cf74c7ee48
+Date: Thu Nov 9 20:00:05 2017 -0800
+A commit message.
+
+===
+commit 3e8bf1d794ca2e9ef8a4007275acf3751c7170ff
+Date: Thu Nov 9 17:01:33 2017 -0800
+Another commit message.
+
+===
+commit e881c9575d180a215d1a636545b8fd9abfb1d2bb
+Date: Wed Dec 31 16:00:00 1969 -0800
+initial commit
+
+```
+
+## glob-log
+
+`java gitlet.Main glob-log`
+
+输出所有的commit文件
+
+## find
+
+`java gitlet.Main find [commit message]`
+
+输出所有的commit文件
+
+打印出包含给定消息的所有提交ID，每行一个
+
+如果有多个这样的提交，它会在单独的行上打印 id
+
+提交消息命令是单操作数， eg. `java gitlet.Main find "initial commit"`
+
+## status
+
+`java gitlet.Main status`
+
+显示当前分支， 并用 * 标记当前分支，同时显示暂存/待添加/删除的文件，格式如下：
+
+```
+=== Branches ===
+*master
+other-branch
+  
+=== Staged Files ===
+wug.txt
+wug2.txt
+  
+=== Removed Files ===
+goodbye.txt
+  
+=== Modifications Not Staged For Commit ===
+junk.txt (deleted)
+wug3.txt (modified)
+  
+=== Untracked Files ===
+random.stuff
+```
+
+## checkout
+
+**核心：就是回到之前的某个commit提交节点**
+
+` java gitlet.Main checkout -- [file name]`
+
+获取 head commit 中存在的文件版本， 并将其放入工作目录，覆盖已经存在的文件版本（如果有）。文件的新版本不会暂存。。
+
+` java gitlet.Main checkout [commit id] -- [file name]`
+
+获取提交中具有指定 ID 版本的文件系统， 并将其放入到工作目录中，覆盖已经存在的文件版本。文件的最新版本不被暂存
+
+` java gitlet.Main checkout [branch name]`
+
+获取给定分支 head 处提交的所有文件，并将他们放在工作目录中，覆盖已经存在的文件版本。同时在此命令结束时，会将把给定的分支视为当前分支 [HEAD] 。
+
+注意：
+
+1. 当切换到另一个分支时，Gitlet会强制让工作目录的内容与目标分支的最新提交完全一致，如果当前分支中存在一些文件（且这些文件已经被提交到当前分支），但是这些文件不存在于目标分支的最新提交中，那这些文件会被系统删除
+2. 当切换到另一个分支时，系统会清空暂存区，如果切换的是当前分支本身，则暂存区不变

@@ -73,7 +73,7 @@ public class Commit implements Serializable {
     public String getHashName(){
         return sha1(this.message, dateToTimeStamp(this.timestamp), this.directParent);
     }
-    public String message() {
+    public String getMessage() {
         return message;
     }
 

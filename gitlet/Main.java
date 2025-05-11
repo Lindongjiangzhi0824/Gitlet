@@ -45,6 +45,29 @@ public class Main {
                     }
                     printLog();
                     break;
+                case "global-log":
+                    if(args.length != 1){
+                        throw new GitletException("Incorrect number of operands");
+                    }
+                    printGlobalLog();
+                    break;
+                case "find":
+                    String findMsg = args[1];
+                    findCommit(findMsg);
+                    break;
+                case "status":
+                    if(args.length != 1){
+                        throw new GitletException("Incorrect number of operands");
+                    }
+                    showStatus();
+                    break;
+                case "checkout":
+                    if(args.length == 1){
+                        throw new GitletException("Incorrect number of operands");
+                    }
+                    checkOut(args);
+                    break;
+
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

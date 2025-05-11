@@ -45,5 +45,14 @@ public class Blob implements Serializable {
 
         return blobContent;
     }
+
+    /**
+     * 将内容写入到指定文件目录中
+     * @param file
+     * @param content
+     */
+    public static void overWriteFileWithBlob(File file, String content){
+        writeContents(file, content);
+    }
 }
 
