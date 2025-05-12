@@ -311,3 +311,17 @@ file.txt
 file.txt  
 ```
 
+## reset
+
+`java gitlet.Main reset [commit id]`
+
+用于重置当前分支的提交历史，暂存区和工作目录。
+
+`checkout`到指定提交跟踪的所有文件，删除 `[commit id]`中不存在的跟踪文件。同时，将当前分支的 head 移动到该提交节点`[commit id]`
+
+## merge
+
+`java gitlet.Main merge [branch name]`
+
+将提交的 `branch name` 合并到当前分支
+
