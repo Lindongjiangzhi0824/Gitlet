@@ -264,3 +264,50 @@ random.stuff
 
 1. 当切换到另一个分支时，Gitlet会强制让工作目录的内容与目标分支的最新提交完全一致，如果当前分支中存在一些文件（且这些文件已经被提交到当前分支），但是这些文件不存在于目标分支的最新提交中，那这些文件会被系统删除
 2. 当切换到另一个分支时，系统会清空暂存区，如果切换的是当前分支本身，则暂存区不变
+
+## branch
+
+`java gitlet.Main branch [branch name]`
+
+创建一个具有给定名称的新分支，并将其指向当前头部提交。分支是对提交节点的引用(sha1标识)的名称。这个命令不会立即切换到新的分支，在调用branch之前，代码应该使用名为 "master" 的默认分支运行。
+
+```
+.gitlet (folder)
+    |── objects (folder) 
+        |-- commits
+            | -- <hash> 
+        |-- blobs
+            |-- <hash>  
+    |── refs (folder)
+        |── heads (folder) 
+            |-- master (file)
+            |-- other file     <----- 指向当前头部提交
+        |-- HEAD (file)     
+    |-- addstage (folder)       
+    |-- removestage (folder)
+file.txt  
+```
+
+## rm-branch
+
+`java gitlet.Main rm-branch [branch name]`
+
+删除具有给定名称的分支，仅删除与分支关联的指针（就说heads下的文件）；它不代表删除在分支下创建的多有提交。
+
+```
+.gitlet (folder)
+    |── objects (folder) 
+        |-- commits
+            | -- <hash> 
+        |-- blobs
+            |-- <hash>  
+    |── refs (folder)
+        |── heads (folder) 
+            |-- master (file)
+            |-- other file     <----- 将此文件删除
+        |-- HEAD (file)     
+    |-- addstage (folder)       
+    |-- removestage (folder)
+file.txt  
+```
+

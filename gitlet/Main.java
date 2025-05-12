@@ -67,6 +67,20 @@ public class Main {
                     }
                     checkOut(args);
                     break;
+                case "branch":
+                    // java gitlet.Main branch [branch name]
+                    if(args.length != 2){
+                        throw new GitletException("Incorrect number of operands");
+                    }
+                    createBranch(args[1]);
+                    break;
+                case "rm-branch":
+                    // java gitlet.Main rm-branch [branch name]
+                    if(args.length != 2){
+                        throw new GitletException("Incorrect number of operands");
+                    }
+                    removeBranch(args[1]);
+                    break;
 
             }
         } catch (Exception e) {

@@ -9,6 +9,7 @@ import static gitlet.Commit.*;
 import static gitlet.Refs.*;
 import static gitlet.Utils.*;
 import static gitlet.Blob.*;
+import static gitlet.Refs.*;
 import static java.lang.System.exit;
 
 // TODO: any imports you need here
@@ -513,6 +514,22 @@ public class Repository {
         }
         /* 将当前给定的分支作为当前分支*/
         saveHEAD(branchName, branchHeadCommit.getHashName());
+    }
+
+    /**
+     * java gitlet.Main branch [branch name]
+     * @param branchName
+     */
+    public static void createBranch(String branchName){
+        Commit headCommit = getHeadCommit();
+        // 获取当前已有的 branch 分支列表
+        List<String> fileNameInHeadDir = plainFilenamesIn(HEADS_DIR);
+        // 此 branch 已经存在
+        if(fileNameInHeadDir.contains(branchName)){
+            message("Branch name already exists.");
+            exit(0);
+        }
+        saveBranch(branchName, headCommit.getHashName());
     }
 }
 
