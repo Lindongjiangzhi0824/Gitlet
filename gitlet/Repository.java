@@ -531,5 +531,27 @@ public class Repository {
         }
         saveBranch(branchName, headCommit.getHashName());
     }
+
+    /**
+     * java gitlet.Main rm-branch [branch name]
+     * @param branchName
+     */
+    public static void removeBranch(String branchName){
+        // 检查是否有该 branchName 存在
+        File branchFile = join(HEADS_DIR, branchName);
+        if(!branchFile.exists()){
+            message("Branch does not exist.");
+            exit(0);
+        }
+        // 检查要删除的分支是否是当前所在分支
+        Commit headCommit = getHeadCommit();
+        if(getHeadBranchName().equals(branchName)){
+            message("Can't remove the current branch.");
+            exit(0);
+        }
+        // 删除这个 branch 的指针文件
+        File branchHeadPoint = join(HEADS_DIR, branchName);
+        branchHeadPoint.delete();
+    }
 }
 
