@@ -553,5 +553,56 @@ public class Repository {
         File branchHeadPoint = join(HEADS_DIR, branchName);
         branchHeadPoint.delete();
     }
+
+    /**
+     * java gitlet.Main reset [commit id]
+     * @param commitId
+     */
+    public static void reset(String commitId){
+        if(getCommitFromId(commitId) == null){
+            message("Commit id is not exists.");
+            exit(0);
+        }
+        Commit headCommit = getHeadCommit();
+        Commit commit = getCommitFromId(commitId);
+        HashMap<String, String> commitBlobMap = commit.getBlobMap();
+
+        // 检查当前目录下是否有没有 track 的文件
+        List<String> workFileNames = plainFilenamesIn(CWD);
+        if(untrackFileExists(headCommit)){
+            Set<String> currTrackSet = headCommit.getBlobMap().keySet();
+            Set<String> resetTrackSet = commit.getBlobMap().keySet();
+            boolean isUntrackInBoth = false; // 作用？
+
+            // workfile 没有在 headCommit 中，也没有在 commit 中， 将其从 addstage 中删除，但CWD中保存
+            for(String workFile: workFileNames){
+                if(!currTrackSet.contains(workFile) && !resetTrackSet.contains(workFile)){
+                    removeStage(workFile); // 逐个清除暂存区中的文件
+                    isUntrackInBoth = true;
+                }
+            }
+            if(!isUntrackInBoth){
+                throw new GitletException("There is an untracked file in the way; "
+                        + "delete it, or add and commit it first.");
+            }
+        }
+
+        // 清空 CWD 文件夹
+        for(String workFile: workFileNames){
+            restrictedDelete(join(CWD, workFile));
+        }
+        // 将 fileNameSet 中每一个跟踪的文件重新写入工作文件夹中
+        for(var trackedFileName : commit.getBlobMap().keySet()){
+            File workFile = join(CWD, trackedFileName);
+            String blobHash = commitBlobMap.get(trackedFileName);
+            String blobContentFromName = getBlobContentFromName(blobHash);
+            writeContents(workFile, blobContentFromName);
+        }
+
+        // 将branchHEAD指向 commit
+        saveBranch(getHeadBranchName(),commitId);
+        // 将目前的HEAD指针指向 commit
+        saveHEAD(getHeadBranchName(),commitId);
+    }
 }
 
