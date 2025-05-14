@@ -81,6 +81,19 @@ public class Main {
                     }
                     removeBranch(args[1]);
                     break;
+                case "reset":
+                    //  java gitlet.Main reset [commit id]
+                    if (args.length != 2) {
+                        throw new GitletException("Incorrect operands.");
+                    }
+                    reset(args[1]);
+                    break;
+                case "merge":
+                    if(args.length != 2){
+                        throw new GitletException("Incorrect operands.");
+                    }
+                    mergeBranch(args[1]);
+                    break;
 
             }
         } catch (Exception e) {

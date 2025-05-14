@@ -210,37 +210,37 @@ public class Commit implements Serializable {
      */
     public static Commit getSplitCommit(Commit commitA, Commit commitB){
         Commit p1 = commitA, p2 = commitB;
-        /* 遍历提交链 */
-        Deque<Commit> dequecommitA = new ArrayDeque<>();
-        Deque<Commit> dequecommitB = new ArrayDeque<>();
+        ArrayDeque<Commit> dequeCommitA = new ArrayDeque<>();
+        ArrayDeque<Commit> dequeCommitB = new ArrayDeque<>();
 
-        /* 保存访问过的节点 */
         HashSet<String> visitedInCommitA = new HashSet<>();
         HashSet<String> visitedInCommitB = new HashSet<>();
 
-        dequecommitA.add(p1);
-        dequecommitB.add(p2);
+        dequeCommitA.add(p1);
+        dequeCommitA.add(p2);
 
-        while(!dequecommitA.isEmpty() && !dequecommitB.isEmpty()){
-            if(!dequecommitA.isEmpty()){
-                /* commitA 的队列中存在可遍历对象 */
-                Commit currA =  dequecommitA.poll();
+        while (!dequeCommitA.isEmpty() || !dequeCommitB.isEmpty()) {
+            if(!dequeCommitA.isEmpty()){
+                /* commitA 的队列中存在可遍历的对象 */
+                Commit currA = dequeCommitA.poll();
                 if(visitedInCommitB.contains(currA.getHashName())){
                     return currA;
                 }
                 visitedInCommitA.add(currA.getHashName());
-                addParentsToDeque(currA, dequecommitA);
+                addParentsToDeque(currA, dequeCommitA);
             }
 
-            if(!dequecommitB.isEmpty()){
-                Commit currB =  dequecommitB.poll();
-                if(visitedInCommitA.contains(currB.getHashName())){
+            if (!dequeCommitB.isEmpty()) {
+                Commit currB = dequeCommitB.poll();
+                if (visitedInCommitA.contains(currB.getHashName())) {
                     return currB;
                 }
                 visitedInCommitB.add(currB.getHashName());
-                addParentsToDeque(currB, dequecommitB);
+                addParentsToDeque(currB, dequeCommitB);
             }
         }
+
+        // 没找到 split 节点
         return null;
     }
 

@@ -323,5 +323,6 @@ file.txt
 
 `java gitlet.Main merge [branch name]`
 
-将提交的 `branch name` 合并到当前分支
+将提交的 `[branch name]` 合并到当前分支
 
+1. 文件在 `other` 分支被修改，但在`HEAD`分支中未被修改 -> 工作区采用 `other`分支的修改版本，文件会被标记为需要 `add`到当前分支的暂存区
